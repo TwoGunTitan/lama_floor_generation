@@ -1,0 +1,3 @@
+data_root_dir: /home/ubuntu/lama/my_dataset/
+out_root_dir: /home/ubuntu/lama/my_dataset/experiments/
+tb_dir: /home/ubuntu/lama/my_dataset/tb_logs/
