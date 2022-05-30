@@ -37,6 +37,9 @@ LaMa generalizes surprisingly well to much higher resolutions (~2k❗️) than i
     - [lama-cleaner](https://github.com/Sanster/lama-cleaner) by [@Sanster](https://github.com/Sanster/lama-cleaner) is a self-host version of [https://cleanup.pictures](https://cleanup.pictures/)
 - Integrated to [Huggingface Spaces](https://huggingface.co/spaces) with [Gradio](https://github.com/gradio-app/gradio). See demo: [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/akhaliq/lama) by [@AK391](https://github.com/AK391)
 - Telegram bot [@MagicEraserBot](https://t.me/MagicEraserBot) by [@Moldoteck](https://github.com/Moldoteck), [code](https://github.com/Moldoteck/MagicEraser)
+- [Auto-LaMa](https://github.com/andy971022/auto-lama) = DE:TR object detection + LaMa inpainting by [@andy971022](https://github.com/andy971022)
+- [LAMA-Magic-Eraser-Local](https://github.com/zhaoyun0071/LAMA-Magic-Eraser-Local) = a standalone inpainting application built with PyQt5 by [@zhaoyun0071](https://github.com/zhaoyun0071)
+- [Hama](https://www.hama.app/) - object removal with a smart brush which simplifies mask drawing.
 
 # Environment setup
 
@@ -78,7 +81,7 @@ There are three options of an environment:
 Run
 ```
 cd lama
-export TORCH_HOME=$(pwd) && export PYTHONPATH=.
+export TORCH_HOME=$(pwd) && export PYTHONPATH=$(pwd)
 ```
 
 **1. Download pre-trained models**
@@ -115,7 +118,7 @@ unzip LaMa_test_images.zip
  <summary>OR prepare your data:</summary>
 1) Create masks named as `[images_name]_maskXXX[image_suffix]`, put images and masks in the same folder. 
 
-- You can use the [script](#test_datasets) for random masks generation. 
+- You can use the [script](https://github.com/saic-mdal/lama/blob/main/bin/gen_mask_dataset.py) for random masks generation. 
 - Check the format of the files:
     ```    
     image1_mask001.png
@@ -152,7 +155,7 @@ Make sure you run:
 
 ```
 cd lama
-export TORCH_HOME=$(pwd) && export PYTHONPATH=.
+export TORCH_HOME=$(pwd) && export PYTHONPATH=$(pwd)
 ```
 
 Then download models for _perceptual loss_:
@@ -211,7 +214,7 @@ On the host machine:
 
     # Make shure you are in lama folder
     cd lama
-    export TORCH_HOME=$(pwd) && export PYTHONPATH=.
+    export TORCH_HOME=$(pwd) && export PYTHONPATH=$(pwd)
 
     # Download CelebA-HQ dataset
     # Download data256x256.zip from https://drive.google.com/drive/folders/11Vz0fqHS2rXDb5pprgTjpD7S2BAJhi1P
@@ -259,7 +262,7 @@ On the host machine:
 
     # Make shure you are in lama folder
     cd lama
-    export TORCH_HOME=$(pwd) && export PYTHONPATH=.
+    export TORCH_HOME=$(pwd) && export PYTHONPATH=$(pwd)
 
     # You need to prepare following image folders:
     $ ls my_dataset
@@ -322,8 +325,8 @@ On the host machine:
     
     touch my_dataset.yaml
     echo "data_root_dir: $(pwd)/my_dataset/" >> my_dataset.yaml
-    echo "out_root_dir: $(pwd)/experiments/" my_dataset.yaml
-    echo "tb_dir: $(pwd)/tb_logs/" my_dataset.yaml
+    echo "out_root_dir: $(pwd)/experiments/" >> my_dataset.yaml
+    echo "tb_dir: $(pwd)/tb_logs/" >> my_dataset.yaml
     mv my_dataset.yaml ${PWD}/configs/training/location/
 
 
