@@ -18,6 +18,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.plugins import DDPPlugin
 
+sys.path.append('.')
 from saicinpainting.training.trainers import make_training_model
 from saicinpainting.utils import register_debug_signal_handlers, handle_ddp_subprocess, handle_ddp_parent_process, \
     handle_deterministic_config
@@ -52,7 +53,6 @@ def main(config: OmegaConf):
         trainer_kwargs = OmegaConf.to_container(config.trainer.kwargs, resolve=True)
         if need_set_deterministic:
             trainer_kwargs['deterministic'] = True
-
         trainer = Trainer(
             # there is no need to suppress checkpointing in ddp, because it handles rank on its own
             callbacks=ModelCheckpoint(dirpath=checkpoints_dir, **config.trainer.checkpoint_kwargs),

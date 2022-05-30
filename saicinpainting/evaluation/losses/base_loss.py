@@ -129,9 +129,14 @@ def calculate_frechet_distance(activations_pred, activations_target, eps=1e-6):
     mu2, sigma2 = fid_calculate_activation_statistics(activations_target)
 
     diff = mu1 - mu2
-
+    # print('debug\n\n\n')
+    sigma1 = sigma1.astype(np.float32)
+    sigma2 = sigma2.astype(np.float32)
+    sigma = sigma1.dot(sigma2)
+    # print(sigma.shape, sigma.dtype)
     # Product might be almost singular
-    covmean, _ = linalg.sqrtm(sigma1.dot(sigma2), disp=False)
+    covmean = linalg.sqrtm(sigma, disp=True)
+    # print('debug')
     if not np.isfinite(covmean).all():
         msg = ('fid calculation produces singular product; '
                'adding %s to diagonal of cov estimates') % eps
@@ -144,7 +149,7 @@ def calculate_frechet_distance(activations_pred, activations_target, eps=1e-6):
         # if not np.allclose(np.diagonal(covmean).imag, 0, atol=1e-3):
         if not np.allclose(np.diagonal(covmean).imag, 0, atol=1e-2):
             m = np.max(np.abs(covmean.imag))
-            raise ValueError('Imaginary component {}'.format(m))
+            # raise ValueError('Imaginary component {}'.format(m))
         covmean = covmean.real
 
     tr_covmean = np.trace(covmean)
@@ -180,7 +185,6 @@ class FIDScore(EvaluatorScore):
             else (self.activations_pred, self.activations_target)
         activations_pred = torch.cat(activations_pred).cpu().numpy()
         activations_target = torch.cat(activations_target).cpu().numpy()
-
         total_distance = calculate_frechet_distance(activations_pred, activations_target, eps=self.eps)
         total_results = dict(mean=total_distance)
 

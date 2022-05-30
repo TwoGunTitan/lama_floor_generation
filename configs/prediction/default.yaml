@@ -3,7 +3,7 @@ outdir: no  # to be overriden in CLI
 
 model:
   path: no  # to be overriden in CLI
-  checkpoint: best.ckpt
+  checkpoint: /home/ubuntu/lama/my_dataset/experiments/ubuntu_2022-05-27_12-46-30_train_big-lama_/models/last.ckpt
 
 dataset:
   kind: default

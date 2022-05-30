@@ -320,7 +320,9 @@ def get_mask_generator(kind, kwargs):
         kind = "mixed"
     if kwargs is None:
         kwargs = {}
-
+    # print('\n\n\n\n\n\n\n\n\n\n')
+    # print(kind)
+    # print('\n\n\n\n\n\n\n\n\n\n')
     if kind == "mixed":
         cl = MixedMaskGenerator
     elif kind == "outpainting":

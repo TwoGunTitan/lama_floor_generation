@@ -1,24 +1,27 @@
 generator_kind: random
 
 mask_generator_kwargs:
-  irregular_proba: 1
+  irregular_proba: 0.5
   irregular_kwargs:
-    min_times: 1
-    max_times: 5
-    max_width: 250
     max_angle: 4
-    max_len: 450
+    max_len: 400
+    max_width: 400
+    max_times: 5
+    min_times: 1
 
-  box_proba: 0.3
+  box_proba: 0.5
   box_kwargs:
     margin: 10
-    bbox_min_size: 30
-    bbox_max_size: 300
+    bbox_min_size: 200
+    bbox_max_size: 400
     max_times: 4
     min_times: 1
 
   segm_proba: 0
-  squares_proba: 0
+  outpainting_proba: 1
+  outpainting_kwargs:
+    min_padding_percent: 0.2
+    max_padding_percent: 0.5
 
   variants_n: 5
 

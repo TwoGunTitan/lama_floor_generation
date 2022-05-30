@@ -24,7 +24,10 @@ LOGGER = logging.getLogger(__name__)
 
 class InpaintingTrainDataset(Dataset):
     def __init__(self, indir, mask_generator, transform):
-        self.in_files = list(glob.glob(os.path.join(indir, '**', '*.jpg'), recursive=True))
+        self.in_files = list(glob.glob(os.path.join(indir, '**', '*'), recursive=True))
+        # print('\n\n\n\n')
+        # print(indir)
+        # print('\n\n\n\n')
         self.mask_generator = mask_generator
         self.transform = transform
         self.iter_i = 0
@@ -34,7 +37,9 @@ class InpaintingTrainDataset(Dataset):
 
     def __getitem__(self, item):
         path = self.in_files[item]
-        img = cv2.imread(path)
+        img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+        car_mask = img[:,:,3]
+        img = img[:,:,:3]
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = self.transform(image=img)['image']
         img = np.transpose(img, (2, 0, 1))
@@ -69,7 +74,7 @@ class ImgSegmentationDataset(Dataset):
         self.transform = transform
         self.out_size = out_size
         self.semantic_seg_n_classes = semantic_seg_n_classes
-        self.in_files = list(glob.glob(os.path.join(indir, '**', '*.jpg'), recursive=True))
+        self.in_files = list(glob.glob(os.path.join(indir, '**', '*'), recursive=True))
 
     def __len__(self):
         return len(self.in_files)
@@ -102,8 +107,8 @@ def get_transforms(transform_variant, out_size):
     if transform_variant == 'default':
         transform = A.Compose([
             A.RandomScale(scale_limit=0.2),  # +/- 20%
-            A.PadIfNeeded(min_height=out_size, min_width=out_size),
-            A.RandomCrop(height=out_size, width=out_size),
+            A.PadIfNeeded(min_height=out_size, min_width=out_size, border_mode=cv2.BORDER_CONSTANT, value=0),
+            A.RandomResizedCrop(height=out_size, width=out_size, scale=(0.15, 0.9), ratio=(1.,1.)),
             A.HorizontalFlip(),
             A.CLAHE(),
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2),
@@ -112,13 +117,14 @@ def get_transforms(transform_variant, out_size):
         ])
     elif transform_variant == 'distortions':
         transform = A.Compose([
-            IAAPerspective2(scale=(0.0, 0.06)),
+            IAAPerspective2(scale=(0.0, 0.06), mode="constant"),
             IAAAffine2(scale=(0.7, 1.3),
                        rotate=(-40, 40),
-                       shear=(-0.1, 0.1)),
-            A.PadIfNeeded(min_height=out_size, min_width=out_size),
+                       shear=(-0.1, 0.1),
+                       mode="constant"),
+            A.PadIfNeeded(min_height=out_size, min_width=out_size, border_mode=cv2.BORDER_CONSTANT, value=0),
             A.OpticalDistortion(),
-            A.RandomCrop(height=out_size, width=out_size),
+            A.RandomResizedCrop(height=out_size, width=out_size, scale=(0.2, 0.75), ratio=(1.,1.)),
             A.HorizontalFlip(),
             A.CLAHE(),
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2),
@@ -127,14 +133,15 @@ def get_transforms(transform_variant, out_size):
         ])
     elif transform_variant == 'distortions_scale05_1':
         transform = A.Compose([
-            IAAPerspective2(scale=(0.0, 0.06)),
+            IAAPerspective2(scale=(0.0, 0.06), mode="constant"),
             IAAAffine2(scale=(0.5, 1.0),
                        rotate=(-40, 40),
                        shear=(-0.1, 0.1),
+                       mode="constant",
                        p=1),
-            A.PadIfNeeded(min_height=out_size, min_width=out_size),
+            A.PadIfNeeded(min_height=out_size, min_width=out_size, border_mode=cv2.BORDER_CONSTANT, value=0),
             A.OpticalDistortion(),
-            A.RandomCrop(height=out_size, width=out_size),
+            A.RandomResizedCrop(height=out_size, width=out_size, scale=(0.15, 0.9), ratio=(1.,1.)),
             A.HorizontalFlip(),
             A.CLAHE(),
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2),
@@ -143,14 +150,15 @@ def get_transforms(transform_variant, out_size):
         ])
     elif transform_variant == 'distortions_scale03_12':
         transform = A.Compose([
-            IAAPerspective2(scale=(0.0, 0.06)),
+            IAAPerspective2(scale=(0.0, 0.06), mode="constant"),
             IAAAffine2(scale=(0.3, 1.2),
                        rotate=(-40, 40),
                        shear=(-0.1, 0.1),
+                       mode="constant",
                        p=1),
-            A.PadIfNeeded(min_height=out_size, min_width=out_size),
+            A.PadIfNeeded(min_height=out_size, min_width=out_size, border_mode=cv2.BORDER_CONSTANT, value=0),
             A.OpticalDistortion(),
-            A.RandomCrop(height=out_size, width=out_size),
+            A.RandomResizedCrop(height=out_size, width=out_size, scale=(0.15, 0.9), ratio=(1.,1.)),
             A.HorizontalFlip(),
             A.CLAHE(),
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2),
@@ -159,14 +167,15 @@ def get_transforms(transform_variant, out_size):
         ])
     elif transform_variant == 'distortions_scale03_07':
         transform = A.Compose([
-            IAAPerspective2(scale=(0.0, 0.06)),
+            IAAPerspective2(scale=(0.0, 0.06), mode="constant"),
             IAAAffine2(scale=(0.3, 0.7),  # scale 512 to 256 in average
                        rotate=(-40, 40),
                        shear=(-0.1, 0.1),
+                       mode="constant",
                        p=1),
-            A.PadIfNeeded(min_height=out_size, min_width=out_size),
+            A.PadIfNeeded(min_height=out_size, min_width=out_size, border_mode=cv2.BORDER_CONSTANT, value=0),
             A.OpticalDistortion(),
-            A.RandomCrop(height=out_size, width=out_size),
+            A.RandomResizedCrop(height=out_size, width=out_size, scale=(0.15, 0.9), ratio=(1.,1.)),
             A.HorizontalFlip(),
             A.CLAHE(),
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2),
@@ -175,12 +184,13 @@ def get_transforms(transform_variant, out_size):
         ])
     elif transform_variant == 'distortions_light':
         transform = A.Compose([
-            IAAPerspective2(scale=(0.0, 0.02)),
+            IAAPerspective2(scale=(0.0, 0.02), mode="constant"),
             IAAAffine2(scale=(0.8, 1.8),
                        rotate=(-20, 20),
-                       shear=(-0.03, 0.03)),
-            A.PadIfNeeded(min_height=out_size, min_width=out_size),
-            A.RandomCrop(height=out_size, width=out_size),
+                       shear=(-0.03, 0.03),
+                       mode="constant"),
+            A.PadIfNeeded(min_height=out_size, min_width=out_size, border_mode=cv2.BORDER_CONSTANT, value=0),
+            A.RandomResizedCrop(height=out_size, width=out_size, scale=(0.15, 0.9), ratio=(1.,1.)),
             A.HorizontalFlip(),
             A.CLAHE(),
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2),
@@ -209,7 +219,6 @@ def make_default_train_dataloader(indir, kind='default', out_size=512, mask_gen_
 
     mask_generator = get_mask_generator(kind=mask_generator_kind, kwargs=mask_gen_kwargs)
     transform = get_transforms(transform_variant, out_size)
-
     if kind == 'default':
         dataset = InpaintingTrainDataset(indir=indir,
                                          mask_generator=mask_generator,
@@ -231,6 +240,8 @@ def make_default_train_dataloader(indir, kind='default', out_size=512, mask_gen_
 
     if dataloader_kwargs is None:
         dataloader_kwargs = {}
+    else:
+        dataloader_kwargs = dict(dataloader_kwargs)
 
     is_dataset_only_iterable = kind in ('default_web',)
 

@@ -1,36 +1,42 @@
 # @package _group_
 
 batch_size: 10
-val_batch_size: 2
-num_workers: 3
+val_batch_size: 10
+num_workers: 8
 
 train:
   indir: ${location.data_root_dir}/train
-  out_size: 256
+  out_size: 512
   mask_gen_kwargs:  # probabilities do not need to sum to 1, they are re-normalized in mask generator
-    irregular_proba: 1
+    irregular_proba: 0.5
     irregular_kwargs:
       max_angle: 4
-      max_len: 200
-      max_width: 100
+      max_len: 400
+      max_width: 200
       max_times: 5
       min_times: 1
 
-    box_proba: 1
+    box_proba: 0.5
     box_kwargs:
       margin: 10
-      bbox_min_size: 30
-      bbox_max_size: 150
+      bbox_min_size: 60
+      bbox_max_size: 300
       max_times: 4
       min_times: 1
 
     segm_proba: 0
+    outpainting_proba: 1
+    outpainting_kwargs:
+      min_padding_percent: 0.1
+      max_padding_percent: 0.4
 
   transform_variant: distortions
   dataloader_kwargs:
     batch_size: ${data.batch_size}
     shuffle: True
     num_workers: ${data.num_workers}
+    pin_memory: True
+    sampler: null
 
 val:
   indir: ${location.data_root_dir}/val
@@ -39,6 +45,7 @@ val:
     batch_size: ${data.val_batch_size}
     shuffle: False
     num_workers: ${data.num_workers}
+    pin_memory: True
 
 #extra_val:
 #  random_thin_256:
@@ -106,3 +113,4 @@ visual_test:
     batch_size: 1
     shuffle: False
     num_workers: ${data.num_workers}
+    pin_memory: True

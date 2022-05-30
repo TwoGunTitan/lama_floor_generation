@@ -9,6 +9,9 @@ import PIL.Image as Image
 import numpy as np
 from joblib import Parallel, delayed
 
+import sys
+sys.path.append('.')
+
 from saicinpainting.evaluation.masks.mask import SegmentationMask, propose_random_square_crop
 from saicinpainting.evaluation.utils import load_yaml, SmallMode
 from saicinpainting.training.data.masks import MixedMaskGenerator
@@ -43,7 +46,7 @@ def process_images(src_images, indir, outdir, config):
             os.makedirs(os.path.dirname(img_outpath), exist_ok=True)
 
             image = Image.open(infile).convert('RGB')
-
+            # print('hello\n\n\n')
             # scale input image to output resolution and filter smaller images
             if min(image.size) < config.cropping.out_min_size:
                 handle_small_mode = SmallMode(config.cropping.handle_small_mode)
@@ -59,8 +62,8 @@ def process_images(src_images, indir, outdir, config):
                 image = image.resize(out_size, resample=Image.BICUBIC)
 
             # generate and select masks
+            # print('debug\n\n\n\n')
             src_masks = mask_generator.get_masks(image)
-
             filtered_image_mask_pairs = []
             for cur_mask in src_masks:
                 if config.cropping.out_square_crop:

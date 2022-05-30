@@ -127,7 +127,10 @@ class BaseInpaintingTrainingModule(ptl.LightningModule):
             kwargs['ddp_kwargs'] = dict(num_replicas=self.trainer.num_nodes * self.trainer.num_processes,
                                         rank=self.trainer.global_rank,
                                         shuffle=True)
-        dataloader = make_default_train_dataloader(**self.config.data.train)
+        # print('\n\n\n\n')
+        # print(**kwargs)
+        # print('\n\n\n\n')
+        dataloader = make_default_train_dataloader(**kwargs)
         return dataloader
 
     def val_dataloader(self):
